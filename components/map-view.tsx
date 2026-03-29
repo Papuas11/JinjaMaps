@@ -54,6 +54,7 @@ export function MapView({ places, selectedPlace, onSelectPlace }: MapViewProps) 
               <p className="text-sm font-semibold text-slate-900">{place.name}</p>
               <p className="text-xs text-slate-600">{place.category}</p>
               <p className="text-xs text-slate-500">{place.address}</p>
+              <p className="text-xs font-medium text-slate-500">{place.phone}</p>
             </div>
           </Popup>
         </Marker>
