@@ -171,6 +171,7 @@ export function DiscoveryPanel({
                   </p>
                   <p className="mt-2 text-sm text-slate-600">{place.description}</p>
                   <p className="mt-2 text-xs text-slate-500">{place.address}</p>
+                  <p className="mt-1 text-xs font-medium text-slate-500">{place.phone}</p>
                 </button>
               ))
             )}

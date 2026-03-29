@@ -3,8 +3,9 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { DiscoveryPanel } from "@/components/discovery-panel";
+import { DEMO_PLACES } from "@/lib/demo-data";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
-import { CATEGORIES, type Ad, type Category, type Place } from "@/types";
+import { type Ad, type Category, type Place } from "@/types";
 
 const MapView = dynamic(() => import("@/components/map-view").then((mod) => mod.MapView), {
   ssr: false,
@@ -22,6 +23,8 @@ export default function HomePage() {
   useEffect(() => {
     async function loadData() {
       if (!isSupabaseConfigured) {
+        setPlaces(DEMO_PLACES);
+        setAds([]);
         setLoading(false);
         return;
       }
@@ -34,10 +37,14 @@ export default function HomePage() {
 
       if (!placesResult.error && placesResult.data) {
         setPlaces(placesResult.data as Place[]);
+      } else {
+        setPlaces([]);
       }
 
       if (!adsResult.error && adsResult.data) {
         setAds(adsResult.data as Ad[]);
+      } else {
+        setAds([]);
       }
 
       setLoading(false);
@@ -87,22 +94,23 @@ export default function HomePage() {
       />
 
       <section className="relative h-full flex-1 bg-slate-200">
+        <MapView places={filteredPlaces} selectedPlace={selectedPlace} onSelectPlace={setSelectedPlace} />
+
+        {!isSupabaseConfigured ? (
+          <div className="pointer-events-none absolute left-4 top-4 z-[500]">
+            <div className="rounded-xl border border-amber-200 bg-amber-50/95 px-3 py-2 text-xs font-medium text-amber-700 shadow-card backdrop-blur-sm">
+              Supabase not configured. Showing demo places around Jinja.
+            </div>
+          </div>
+        ) : null}
+
         {loading ? (
-          <div className="flex h-full items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 z-[450] flex items-center justify-center bg-white/35 backdrop-blur-[1px]">
             <div className="rounded-2xl bg-white px-6 py-4 text-sm font-medium text-slate-600 shadow-card">
               Loading Jinja map data...
             </div>
           </div>
-        ) : !isSupabaseConfigured ? (
-          <div className="flex h-full items-center justify-center p-6">
-            <div className="max-w-md rounded-2xl border border-amber-200 bg-amber-50 px-6 py-4 text-sm text-amber-700 shadow-card">
-              Configure <code className="font-mono">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-              <code className="font-mono">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to load live places and ads.
-            </div>
-          </div>
-        ) : (
-          <MapView places={filteredPlaces} selectedPlace={selectedPlace} onSelectPlace={setSelectedPlace} />
-        )}
+        ) : null}
       </section>
     </main>
   );
